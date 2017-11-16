@@ -3,21 +3,24 @@ package net.willeh.run;
 public class Main {
 
 	public static void main(String[] args) {
-	download.start();
-	try {
-		download.join();
-	} catch (InterruptedException e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
-	System.out.println("first");
+		download.start();
+		try
+		{
+			download.join();
+		}
+		catch (InterruptedException e) 
+		{
+		
+			e.printStackTrace();
+		}
+	
 	}
 	static Thread download = new Thread(){
 		public void run(){
 			try {
-				System.out.println(InRead.main("https://www.google.com/"));
+				InRead reader = new InRead("https://www.google.com/");
+				System.out.println(reader.getPageData());
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}		
 		}
