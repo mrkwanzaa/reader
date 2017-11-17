@@ -1,44 +1,26 @@
 package net.willeh.run;
 
 import java.net.*;
+import java.util.concurrent.Executors;
 import java.io.*;
 
 public class InRead {
 	private String requestUrl;
 	private String pageData;
-	    
+	private boolean pageRead;
 		public InRead(String requestUrl) {
 	    	this.requestUrl = requestUrl;
-	    	this.pageData = this.refreshPage();
+	    	this.refreshPage();
 	    }
-	    public String refreshPage()
+	    public void refreshPage()
 	    {
-	    	try {
-	    	int x = 0;
-	    	String webTemp = "";
-	        URL url = new URL(requestUrl);
-	        URLConnection report = url.openConnection();
-	        BufferedReader in = new BufferedReader(new InputStreamReader(report.getInputStream()));
-	        String inputLine;
-
-	        while ((inputLine = in.readLine()) != null) {
-	        	if(x == 0){
-	        		webTemp = inputLine;
-	        		x++;
-	        	}else{
-	        		webTemp = webTemp + inputLine;
-	        		x++;
-	        		}
-	        }
-	            
-	        in.close();
-	        return webTemp;
-	    	}
-	    	catch(Exception e)
-	    	{
-	    		e.printStackTrace();
-	    		return null;
-	    	}
+	    	pageRead = false;
+	    	Executors.newCachedThreadPool().execute(new Runnable() {
+			    @Override
+			    public void run() {
+			        dataLoad();
+			    }
+			});
 	    }
 		/**
 		 * @return the requestUrl
@@ -51,7 +33,7 @@ public class InRead {
 		 */
 		public void newRequest(String requestUrl) {
 			this.requestUrl = requestUrl;
-			this.pageData = this.refreshPage();
+			this.refreshPage();
 		}
 		/**
 		 * @return the pageData
@@ -66,6 +48,43 @@ public class InRead {
 		public String toString() {
 			return "InRead [pageData=" + pageData + "]";
 		}
+		private void dataLoad()
+		{
+			try {
+		    	int x = 0;
+		    	String webTemp = "";
+		        URL url = new URL(requestUrl);
+		        URLConnection report = url.openConnection();
+		        BufferedReader in = new BufferedReader(new InputStreamReader(report.getInputStream()));
+		        String inputLine;
+
+		        while ((inputLine = in.readLine()) != null) {
+		        	if(x == 0){
+		        		webTemp = inputLine;
+		        		x++;
+		        	}else{
+		        		webTemp = webTemp + inputLine;
+		        		x++;
+		        		}
+		        }
+		            
+		        in.close();
+		        this.pageData = webTemp;
+		    	}
+		    	catch(Exception e)
+		    	{
+		    		e.printStackTrace();
+		    		this.pageData = null;
+		    	}
+			this.pageRead = true;
+		}
+		/**
+		 * @return the pageRead
+		 */
+		public boolean isPageRead() {
+			return pageRead;
+		}
+		
 		
 	}
 
